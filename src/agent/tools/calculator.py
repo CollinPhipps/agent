@@ -60,7 +60,7 @@ class Calculator(ast.NodeVisitor):
 
         op_type = type(node.op)
         if op_type not in self.operator_map:
-            raise ValueError(f"Unsupported binary operator: {op_type.__name__}")
+            raise ValueError(f"Unsupported unary operator: {op_type.__name__}")
         
         return self.operator_map[op_type](operand)
 
