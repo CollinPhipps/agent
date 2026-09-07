@@ -28,4 +28,4 @@ dev = [
 ]
 
 [tool.uv.sources]
-vdb = { path = "/home/phipp/vdb", editable = true }
+vdb = { git = "https://github.com/CollinPhipps/vector-database.git", rev = "7e5a1b253fd1c413f4343de336b50f1a72759f6a" }
