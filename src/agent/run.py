@@ -19,9 +19,10 @@ tools = [{
     },
     {
     'name': 'rag',
-    'description': 'Use this for finding answers to questions to research papers on the topics of machine learning, '
+    'description': ('Use this for finding answers to questions to research papers on the topics of machine learning, '
     'artificial intelligence, quantitative finance, physics, and math. Returned from this are the top k results of '
-    'a search over a vector database containing abstracts of papers from all of these topcs.',
+    'a search over a vector database containing abstracts of papers from all of these topcs. You are to look at the'
+    'scores and metadata and determine the relevancy yourself. If nothing seems relevant, say you were unable to find anything relevent.'),
     'input_schema': {
         'type': 'object',
         'properties': {
@@ -82,7 +83,7 @@ def run_turn(messages, client, calculator, embed_model, vdb):
                         error_result['content'] = str(e)
                         error = True
                 if error:
-                    tool_results.append(tool_results)
+                    tool_results.append(error_result)
                 else:
                     tool_results.append({'type': 'tool_result', 'tool_use_id': block.id, 'content': json.dumps(output)})
 
@@ -92,9 +93,8 @@ def run_turn(messages, client, calculator, embed_model, vdb):
         raise RuntimeError(f"hit {MAX_ITERS} iterations without a final answer")
 
 def main():
-    load_dotenv()
-
     print("Initializing...")
+    load_dotenv()
     calculator = Calculator()
     embed_model = SentenceTransformer('all-MiniLM-L6-v2')
     vdb = VectorStore(dim=384)
@@ -104,10 +104,14 @@ def main():
     messages = []
     while True:
         user_input = input('You: ')
+        print('\n----------------\n')
         if user_input in ('quit', 'exit'): break
         messages.append({'role': 'user', 'content': user_input})
         run_turn(messages, client, calculator, embed_model, vdb)
-        print(messages[-1]['content']['text'])
+        final_text = "".join(block.text for block in messages[-1]['content'] if block.type == 'text')
+        print(final_text)
+        print('\n----------------\n')
+
 
 if __name__ == "__main__":
     main()

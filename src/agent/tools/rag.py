@@ -100,8 +100,7 @@ def load_database_cached(vdb: VectorStore, embed_file: str, meta_file: str):
 def retrieve(vdb, model, query, k):
     query_vector = model.encode(query, convert_to_numpy=True)
     top_k = vdb.flat_search(query_vector, k=k, metric=MetricType.COSINE) # (score, id)
-    ids = [res[1] for res in top_k]
-    return [vdb.get_metadata(id) for id in ids]
+    return [{'score': float(score), 'metadata': vdb.get_metadata(id)} for score, id in top_k]
 
 if __name__ == '__main__':
     vdb = VectorStore(dim=384)
